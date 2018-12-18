@@ -13,15 +13,18 @@ import (
 )
 
 var (
-	MsgKey		string = "console-err"
-	MsgTitle	string = "Console error logs"
-	SendUrl		string = "http://localhost:8080/sendMsg"
+	MsgKey			string = "console-err"
+	MsgTitle		string = "Console error logs"
+	SendUrl			string = "http://localhost:8080/sendMsg"
+	RedisConnStr	string = "localhost:6379"
+	RedisPasswd		string = ""
+	RedisDB			int = 0
 )
 
 
 type LarkRobotMsg struct {
 	Title	string	`json:"title"`
-	Content	string	`json:"content"`
+	Text	string	`json:"text"`
 }
 
 
@@ -44,7 +47,7 @@ func sendMsg(msgChan <-chan string, sendUrl string) {
 	for {
 		select {
 		case msg := <-msgChan:
-			larkMsg := LarkRobotMsg{Title: MsgTitle, Content: msg}
+			larkMsg := LarkRobotMsg{Title: MsgTitle, Text: msg}
 			jLarkMsg, err := json.Marshal(larkMsg)
 			if err != nil {
 				log.Println("反序列化日志失败，err = ", err)
@@ -75,9 +78,9 @@ func main() {
 
 	//连接redis
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
-		Password: "",
-		DB: 0,
+		Addr: RedisConnStr,
+		Password: RedisPasswd,
+		DB: RedisDB,
 	})
 	defer redisClient.Close()
 
